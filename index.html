@@ -205,6 +205,14 @@ textarea.inp{resize:none;min-height:88px;display:block}
 .ro{background:var(--color-bg-page);border:1px solid var(--color-border-default);border-radius:var(--radius-md);padding:10px 12px;color:var(--color-text-primary)}
 .ib{width:32px;height:32px;border-radius:8px;border:0;background:none;color:var(--color-text-secondary);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .ib:hover{background:var(--color-bg-subtle)}
+.sec-h{font:700 13px/18px var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-brand);display:flex;align-items:center;gap:12px}
+.sec-h::after{content:'';flex:1;height:1px;background:var(--color-action-primary-border)}
+.blk{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--color-border-subtle)}
+.blk.first{border-top:0;padding-top:4px}
+.blk .bt{font:600 14px/20px var(--font-ui);color:var(--color-text-primary)}
+.orow{display:grid;grid-template-columns:190px 1fr 32px;gap:8px;align-items:center}
+.orow .nm{font:500 14px/20px var(--font-ui)}
+select.inp{appearance:auto;cursor:pointer}
 </style>
 </head>
 <body>
@@ -453,7 +461,7 @@ function record(shellFn,activeLabel,role,tab){
    <div class="tbl"><div class="tr th" style="grid-template-columns:90px 1.6fr 110px 130px 150px"><span>Mã</span><span>Công việc</span><span>Hạn</span><span>Nguồn</span><span></span></div>
    ${[['TASK-002','Đo lại SpO2 và nhịp thở',bdg('highsub','Quá hạn 12 phút'),'ORD-014'],['TASK-008','Đo lại nhiệt độ','09:30','self'],['TASK-009','Cho thuốc A','20:00','ORD-014']].map(r=>`<div class="tr" style="grid-template-columns:90px 1.6fr 110px 130px 150px"><span class="muted">${r[0]}</span><span class="b">${r[1]}</span><span>${r[2]}</span><span>${srcB(r[3]==='self'?'self':'o',r[3].slice(4))}</span><span style="text-align:right">${nd?btn(r[3]==='self'?'Sửa':'Mở y lệnh',{sm:1,go:r[3]==='self'?'W2':'W6',tab:r[3]==='self'?'':'orders'}):''}</span></div>`).join('')}</div>`;
   const orders=`<div class="row sb"><span class="muted sm">Y lệnh của P-001 ${nd?'· chỉ đọc':''}</span>${nd?bdg('neutral','Chỉ đọc','lock'):btn('Y lệnh mới',{sm:1,v:'primary',icon:'plus',go:'B1'})}</div>
-   ${[['ORD-014','17/11 · 07:30','Bác sĩ B','Đo SpO2 và nhịp thở mỗi 1 giờ. Thuốc A 1 viên uống, 2 lần/ngày (08:00, 20:00). Báo bác sĩ nếu SpO2 giảm dưới 94%.',3],['ORD-009','16/11 · 15:10','Bác sĩ B','Theo dõi ăn uống, ghi vào–ra. Hỗ trợ vận động theo CS-001.',2]].map(r=>`<div class="card flat"><div class="row sb"><div class="row"><b>${r[0]}</b><span class="muted sm">${r[1]} · ${r[2]}</span></div><div class="row">${bdg('low','Đã xác nhận','check-circle')}<span class="badge neutral">${r[4]} công việc</span></div></div><div class="sm">${r[3]}</div></div>`).join('')}`;
+   ${[['ORD-014','17/11 · 07:30','Bác sĩ B','Chẩn đoán: suy hô hấp. Thuốc A 1 viên uống, 2 lần/ngày (08:00, 20:00); NaCl 0,9% 500 ml; khí máu động mạch ngay; theo dõi SpO2 và nhịp thở mỗi 1 giờ, báo bác sĩ nếu SpO2 dưới 94%.',3],['ORD-009','16/11 · 15:10','Bác sĩ B','Theo dõi ăn uống, ghi vào–ra. Hỗ trợ vận động theo CS-001.',2]].map(r=>`<div class="card flat"><div class="row sb"><div class="row"><b>${r[0]}</b><span class="muted sm">${r[1]} · ${r[2]}</span></div><div class="row">${bdg('low','Đã xác nhận','check-circle')}<span class="badge neutral">${r[4]} công việc</span></div></div><div class="sm">${r[3]}</div></div>`).join('')}`;
   return shellFn(activeLabel,{
    title:'P-001 · Giường A01',sub:`<span class="lnk" tabindex="0" role="link" data-go="${nd?'W5':'B3'}">← ${nd?'Danh sách bệnh nhân':'Dashboard'}</span> · 82 tuổi · Khoa Lão nội trú ${news(8)}`,
    actions:nd?btn('Tạo công việc',{icon:'plus',open:'m-create'})+btn('Ghi nhận mới',{v:'primary',icon:'mic',go:'W3'}):btn('Y lệnh mới',{v:'primary',icon:'plus',go:'B1'}),
@@ -511,36 +519,65 @@ def('M6','Mobile · Điều dưỡng','Bác sĩ bận, gọi người kế tiế
 
 /* --- Web Bác sĩ --- */
 const stepper=n=>`<div class="stepper">${['Nhập y lệnh','Kiểm tra công việc','Gửi'].map((t,i)=>`<span class="row ${i+1===n?'cur':i+1<n?'done':''}" style="gap:8px"><b>${i+1<n?I('check',14):i+1}</b>${t}</span>${i<2?'<s></s>':''}`).join('')}</div>`;
-const ORD_TXT='Thuốc A 1 viên uống, 2 lần/ngày (08:00, 20:00).\nĐo SpO2 và nhịp thở mỗi 1 giờ.\nBáo bác sĩ nếu SpO2 giảm dưới 94%.';
+/* ===== Y lệnh chia mục: Chẩn đoán + Y LỆNH ĐIỀU TRỊ ===== */
+const CAT={
+ thuoc:{title:'Thuốc',ph:'+ Chọn thuốc để thêm…',notePh:'Ghi chú: liều, đường dùng, tần suất…',opts:['Thuốc A','Thuốc B','Thuốc C','Thuốc D']},
+ dich:{title:'Dịch truyền',ph:'+ Chọn dịch truyền để thêm…',notePh:'Ghi chú: thể tích, tốc độ truyền…',opts:['NaCl 0,9%','Ringer lactat','Glucose 5%']},
+ cls:{title:'Cận lâm sàng',ph:'+ Chọn xét nghiệm hoặc chẩn đoán hình ảnh…',notePh:'Ghi chú: thời điểm, yêu cầu kèm theo…',opts:['Công thức máu','Khí máu động mạch','CRP','Điện giải đồ','X-quang ngực']}};
+const ORD_DEF={dx:'Suy hô hấp, nghi nhiễm khuẩn hô hấp',care:'Nằm đầu cao 30°. Hỗ trợ thở oxy nếu SpO2 dưới 94%.',
+ thuoc:[['Thuốc A','1 viên uống, 2 lần/ngày (08:00, 20:00)']],dich:[['NaCl 0,9%','500 ml, 30 giọt/phút']],
+ cls:[['Khí máu động mạch','Làm ngay'],['Công thức máu','Sáng mai']],follow:'Đo SpO2 và nhịp thở mỗi 1 giờ. Báo bác sĩ nếu SpO2 giảm dưới 94%.'};
+let ORD_DATA=JSON.parse(JSON.stringify(ORD_DEF));
+const fmtOrder=d=>{const L=a=>a.length?a.map(r=>`  - ${r[0]}${r[1]?': '+r[1]:''}`).join('\n'):'  (không có)';
+ return `Chẩn đoán: ${d.dx||'(chưa nhập)'}\n\nY LỆNH ĐIỀU TRỊ\n* Chăm sóc & Hô hấp: ${d.care||'(không có)'}\n* Thuốc:\n${L(d.thuoc)}\n* Dịch truyền:\n${L(d.dich)}\n* Cận lâm sàng:\n${L(d.cls)}\n* Theo dõi: ${d.follow||'(không có)'}`;};
+function readOrder(){
+ const g=k=>{const el=frame.querySelector(`[data-k="${k}"]`);return el?el.value.trim():'';};
+ const rows=k=>[...frame.querySelectorAll(`[data-list="${k}"] .orow`)].map(r=>[r.dataset.name,r.querySelector('input').value.trim()]);
+ return {dx:g('dx'),care:g('care'),follow:g('follow'),thuoc:rows('thuoc'),dich:rows('dich'),cls:rows('cls')};}
+const orow=(k,name,note='')=>`<div class="orow" data-name="${name}"><span class="nm">${name}</span><input class="inp" value="${note}" placeholder="${CAT[k].notePh}" aria-label="Ghi chú ${name}"><button class="ib" data-rm aria-label="Xóa ${name}">${I('trash',16)}</button></div>`;
+const listBlk=(k,rows,first)=>`<div class="blk ${first?'first':''}"><div class="bt">${CAT[k].title}</div><div class="col" style="gap:8px" data-list="${k}">${rows.map(r=>orow(k,r[0],r[1])).join('')}</div><select class="inp" data-add="${k}" aria-label="Thêm ${CAT[k].title}"><option value="">${CAT[k].ph}</option>${CAT[k].opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+const txtBlk=(title,k,val,ph,rows,first)=>`<div class="blk ${first?'first':''}"><label class="bt" for="f-${k}">${title}</label><textarea id="f-${k}" class="inp" rows="${rows||2}" style="min-height:56px" data-k="${k}" placeholder="${ph}">${val}</textarea></div>`;
+const taskFromOrder=d=>{const t=[];
+ if(d.care)t.push(['Chăm sóc & hô hấp','Điều dưỡng A · theo y lệnh',d.care]);
+ d.thuoc.forEach(r=>t.push(['Cho '+r[0],'Điều dưỡng C'+(r[1]?' · '+r[1]:''),r[0]+(r[1]?': '+r[1]:'')]));
+ d.dich.forEach(r=>t.push(['Truyền '+r[0],'Điều dưỡng A'+(r[1]?' · '+r[1]:''),r[0]+(r[1]?': '+r[1]:'')]));
+ d.cls.forEach(r=>t.push(['Thực hiện '+r[0],'Điều dưỡng A'+(r[1]?' · '+r[1]:''),r[0]+(r[1]?': '+r[1]:'')]));
+ if(d.follow)t.push(['Theo dõi','Điều dưỡng A · theo y lệnh',d.follow]);
+ return t;};
+
 def('B1','Web · Bác sĩ','Nhập y lệnh','web','Từ flow: bác sĩ khám → nhập/sửa y lệnh trên web → hệ thống tạo task cho ĐD. PRD: AI không tự tạo y lệnh nên bác sĩ phải kiểm tra trước khi gửi.',
- 'Bố cục lại (BS-1): một ô nhập tự do làm trọng tâm, bối cảnh bệnh nhân ở bên phải, bỏ biểu mẫu chia nhỏ liều/đường dùng/tần suất vì trùng với phần AI tách công việc. Có thanh 3 bước và một nút chính.',
+ 'Y lệnh chia mục: Chẩn đoán; Y LỆNH ĐIỀU TRỊ gồm Chăm sóc & Hô hấp (văn bản), Thuốc / Dịch truyền / Cận lâm sàng (chọn từ danh sách, mỗi mục có ghi chú), Theo dõi (văn bản). Bỏ ô văn bản tự do duy nhất.',
  ()=>BS('Y lệnh',{
  title:'Y lệnh · P-001 · Giường A01',sub:'82 tuổi · Bác sĩ B',
  actions:btn('Lưu nháp',{})+btn('Kiểm tra công việc',{v:'primary',icon:'chevron',go:'B2'}),
  body:`${stepper(1)}
- <div class="cols" style="flex:1">
-  <div class="card" style="width:244px;flex:none"><h3>Người bệnh</h3><div class="srch" style="width:auto;min-height:38px">${I('search',16)}<input placeholder="Tìm bệnh nhân" aria-label="Tìm bệnh nhân"></div>
-   ${PT.slice(0,5).map((p,i)=>`<div class="item" style="${i===0?'background:var(--color-action-primary-subtle);border-color:var(--color-action-primary-border)':''}"><span class="b sm grow">${p.id} · ${p.bed}</span>${news(p.news,1)}</div>`).join('')}</div>
-  <div class="card grow"><div class="row sb"><h3>Nội dung y lệnh</h3>${bdg('neutral','Văn bản tự do')}</div>
-   <textarea class="inp" style="min-height:220px" rows="9" aria-label="Nội dung y lệnh">${ORD_TXT}</textarea>
-   <div class="row" style="flex-wrap:wrap"><span class="cap muted">Chèn mẫu:</span><span class="chip">Thuốc</span><span class="chip">Theo dõi chỉ số</span><span class="chip">Xét nghiệm</span><span class="chip">Chăm sóc</span></div>
-   <div class="note ai">Sau khi bấm Kiểm tra công việc, hệ thống đọc nội dung và đề xuất công việc cho điều dưỡng. Bác sĩ kiểm tra, chỉnh sửa rồi mới gửi. Hệ thống không tự tạo y lệnh.</div></div>
+ <div class="cols" style="flex:1;gap:16px;min-height:0">
+  <div class="col grow" style="gap:12px;overflow:auto;padding:0 4px 4px 0">
+   <div class="card" style="flex-direction:row;align-items:center;gap:12px;padding:12px 16px"><span class="avatar">82</span><div class="grow"><div class="b sm">P-001 · Giường A01</div><div class="cap muted">Bác sĩ B · lần khám 17/11/2026</div></div>${news(8)}${btn('Đổi bệnh nhân',{sm:1,go:'B3'})}</div>
+   <div class="card" style="gap:8px;padding:12px 16px"><h3>Chẩn đoán</h3><textarea class="inp" rows="2" style="min-height:56px" data-k="dx" aria-label="Chẩn đoán" placeholder="Nhập chẩn đoán">${ORD_DATA.dx}</textarea></div>
+   <div class="card" style="gap:0"><div class="sec-h" style="padding-bottom:10px">Y lệnh điều trị</div>
+    ${txtBlk('Chăm sóc & Hô hấp','care',ORD_DATA.care,'Nhập y lệnh chăm sóc và hô hấp',2,1)}
+    ${listBlk('thuoc',ORD_DATA.thuoc)}
+    ${listBlk('dich',ORD_DATA.dich)}
+    ${listBlk('cls',ORD_DATA.cls)}
+    ${txtBlk('Theo dõi','follow',ORD_DATA.follow,'Nhập nội dung theo dõi',2)}</div></div>
   <div class="col" style="width:300px;flex:none;gap:16px">
    <div class="card"><h3>Bối cảnh bệnh nhân</h3><div class="row" style="gap:10px"><span class="big">8</span>${news(8)}</div>${bdg('brand','Nhận thức thay đổi mới')}<div class="sm muted">SpO2 92%, mạch 110, nhịp thở 26, HA tâm thu 98.</div><div class="cap muted">Cảnh báo AL-001 chưa tiếp nhận</div></div>
-   <div class="card"><h3>Y lệnh gần đây</h3><div class="item"><div class="grow"><div class="b sm">ORD-014 · 07:30</div><div class="cap muted">Đo SpO2 mỗi 1 giờ…</div></div></div><div class="item"><div class="grow"><div class="b sm">ORD-009 · hôm qua</div><div class="cap muted">Theo dõi ăn uống…</div></div></div></div></div></div>`}));
+   <div class="card"><h3>Y lệnh gần đây</h3><div class="item"><div class="grow"><div class="b sm">ORD-014 · 07:30</div><div class="cap muted">Đo SpO2 mỗi 1 giờ…</div></div></div><div class="item"><div class="grow"><div class="b sm">ORD-009 · hôm qua</div><div class="cap muted">Theo dõi ăn uống…</div></div></div></div>
+   <div class="note ai">Sau khi bấm Kiểm tra công việc, hệ thống đề xuất công việc cho điều dưỡng từ các mục bên trái. Bác sĩ kiểm tra, chỉnh sửa rồi mới gửi. Hệ thống không tự tạo y lệnh.</div></div></div>`}));
 
 def('B2','Web · Bác sĩ','Kiểm tra y lệnh','web','Từ flow: "Bác sĩ xác nhận?" → Kiểm tra, chỉnh sửa → "Chỉnh sửa y lệnh?" → hệ thống tạo task cho ĐD.',
- 'Chia hai phần rõ ràng (BS-2): bên trái Y lệnh gốc nguyên văn, sửa được; bên phải Công việc điều dưỡng do AI tạo, có trích câu nguồn từng việc và sửa, xóa, thêm được.',
+ 'Y lệnh gốc lấy nguyên từ các mục vừa nhập ở bước 1; danh sách công việc được tách theo từng mục (mô phỏng, người nhận và giờ là dữ liệu mẫu).',
  ()=>BS('Y lệnh',{
  title:'Kiểm tra y lệnh · P-001',sub:'Bác sĩ B · chưa gửi',
  actions:btn('Quay lại nhập',{go:'B1'})+btn('Xác nhận và gửi y lệnh',{v:'primary',icon:'send',go:'B3'}),
  body:`${stepper(2)}
- <div class="cols" style="flex:1;gap:16px">
+ <div class="cols" style="flex:1;gap:16px;min-height:0">
   <div class="card grow" style="flex:1"><div class="row sb"><h3>Y lệnh gốc</h3>${bdg('neutral','Nguyên văn do bác sĩ nhập')}</div>
-   <textarea class="inp" style="min-height:250px" rows="10" aria-label="Y lệnh gốc">${ORD_TXT}</textarea>
+   <textarea class="inp" style="flex:1;min-height:300px" rows="14" aria-label="Y lệnh gốc">${fmtOrder(ORD_DATA)}</textarea>
    <div class="row sb"><span class="cap muted">Sửa nội dung rồi bấm Cập nhật để tạo lại danh sách công việc bên cạnh.</span>${btn('Cập nhật công việc',{sm:1,icon:'activity'})}</div></div>
-  <div class="card grow" style="flex:1.15"><div class="row sb"><h3>Công việc điều dưỡng</h3>${bdg('brand','AI tạo từ y lệnh · chưa gửi','info')}</div>
-   ${[['Cho thuốc A 1 viên (uống)','Điều dưỡng C · 08:00 và 20:00','Thuốc A 1 viên uống, 2 lần/ngày'],['Đo SpO2 và nhịp thở','Điều dưỡng A · mỗi 1 giờ','Đo SpO2 và nhịp thở mỗi 1 giờ'],['Báo bác sĩ nếu SpO2 dưới 94%','Điều kiện theo dõi · Điều dưỡng A','Báo bác sĩ nếu SpO2 giảm dưới 94%']].map(r=>`<div class="item" style="align-items:flex-start"><div class="grow"><div class="b sm">${r[0]}</div><div class="cap muted">${r[1]}</div><div class="cap" style="margin-top:4px;color:var(--color-text-brand)">Từ câu: “${r[2]}”</div></div><button class="ib" aria-label="Sửa">${I('edit',16)}</button><button class="ib" aria-label="Xóa">${I('trash',16)}</button></div>`).join('')}
+  <div class="card grow" style="flex:1.15;overflow:auto"><div class="row sb"><h3>Công việc điều dưỡng</h3>${bdg('brand','AI tạo từ y lệnh · chưa gửi','info')}</div>
+   ${taskFromOrder(ORD_DATA).map(r=>`<div class="item" style="align-items:flex-start"><div class="grow"><div class="b sm">${r[0]}</div><div class="cap muted">${r[1]}</div><div class="cap" style="margin-top:4px;color:var(--color-text-brand)">Từ mục: “${r[2]}”</div></div><button class="ib" aria-label="Sửa">${I('edit',16)}</button><button class="ib" aria-label="Xóa">${I('trash',16)}</button></div>`).join('')}
    ${btn('Thêm công việc',{sm:1,icon:'plus'})}
    <div class="note">Bác sĩ kiểm tra và quyết định. Sau khi gửi, các công việc xuất hiện ở điều dưỡng ở chế độ chỉ đọc, kèm liên kết về y lệnh gốc.</div></div></div>`}));
 
@@ -654,6 +691,8 @@ document.addEventListener('click',e=>{
     const ctl=sg.parentElement.dataset.ctl;if(ctl){const one=sg.dataset.val==='1';const a=frame.querySelector('#'+ctl+'-1'),z=frame.querySelector('#'+ctl+'-0');if(a)a.hidden=!one;if(z)z.hidden=one;}return;}
   const ch=e.target.closest('[data-chip]');
   if(ch){ch.parentElement.querySelectorAll('.chip').forEach(b=>b.classList.remove('on'));ch.classList.add('on');return;}
+  const rm=e.target.closest('[data-rm]');
+  if(rm){rm.closest('.orow').remove();return;}
   const op=e.target.closest('[data-open]');
   if(op){const m=frame.querySelector('#'+op.dataset.open);if(m)m.hidden=false;return;}
   const cl=e.target.closest('[data-close]');
@@ -661,8 +700,15 @@ document.addEventListener('click',e=>{
   const sh=e.target.closest('[data-show]');
   if(sh){const grp=sh.dataset.group;frame.querySelectorAll(`[data-pane-g="${grp}"]`).forEach(p=>{p.hidden=p.id!==sh.dataset.show;});frame.querySelectorAll(`[data-show][data-group="${grp}"]`).forEach(b=>b.classList.toggle('on',b===sh));return;}
   const g=e.target.closest('[data-go]');
-  if(g){pendingTab=g.dataset.tab||null;nav(g.dataset.go);}
+  if(g){if(cur==='B1')ORD_DATA=readOrder();pendingTab=g.dataset.tab||null;nav(g.dataset.go);}
   if(e.target.classList&&e.target.classList.contains('modal'))e.target.hidden=true;
+});
+document.addEventListener('change',e=>{
+  const sl=e.target;
+  if(sl.matches&&sl.matches('select[data-add]')&&sl.value){
+    const k=sl.dataset.add,list=frame.querySelector(`[data-list="${k}"]`);
+    if(list&&![...list.children].some(r=>r.dataset.name===sl.value)){list.insertAdjacentHTML('beforeend',orow(k,sl.value,''));const i=list.lastElementChild.querySelector('input');if(i)i.focus();}
+    sl.value='';}
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Tab'&&e.target.matches&&e.target.matches('.gt')){
@@ -670,7 +716,7 @@ document.addEventListener('keydown',e=>{
     if(ta.value!==sug&&sug.startsWith(ta.value)){e.preventDefault();ta.value=sug;ghostSync(ta);return;}
   }
   if(e.key==='Escape'){frame.querySelectorAll('.modal').forEach(m=>m.hidden=true);}
-  if(e.target.matches&&e.target.matches('input,textarea'))return;
+  if(e.target.matches&&e.target.matches('input,textarea,select'))return;
   const i=ORDER.indexOf(cur);
   if(e.key==='ArrowRight'&&i<ORDER.length-1)nav(ORDER[i+1]);
   if(e.key==='ArrowLeft'&&i>0)nav(ORDER[i-1]);
