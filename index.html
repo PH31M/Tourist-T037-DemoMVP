@@ -213,6 +213,32 @@ textarea.inp{resize:none;min-height:88px;display:block}
 .orow{display:grid;grid-template-columns:190px 1fr 32px;gap:8px;align-items:center}
 .orow .nm{font:500 14px/20px var(--font-ui)}
 select.inp{appearance:auto;cursor:pointer}
+.pr{display:grid;align-items:stretch;border-top:1px solid var(--color-border-subtle);font-size:13px;line-height:18px;cursor:pointer;background:#fff}
+.pr:not(.prh):hover .pc:not(.pn){background:var(--color-bg-page)}
+.pc{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12px 8px;gap:4px;min-width:0}
+.prh{cursor:default;background:var(--color-bg-page);border-top:0}
+.prh .pc{padding:9px 8px;font:500 12px/16px var(--font-ui);color:var(--color-text-secondary)}
+.pc.pn b{font:600 14px/20px var(--font-ui)}
+.pc.pn span{font:400 12px/16px var(--font-ui);opacity:.92}
+.pn.high{background:var(--status-high-bg);color:#fff}
+.pn.medium{background:var(--status-medium-border);color:#4A3200}
+.pn.low{background:var(--status-low-fg);color:#fff}
+.pn.unknown{background:var(--status-unknown-border);color:var(--status-unknown-fg)}
+.nws{display:flex;align-items:baseline;gap:6px}
+.nws small{font:700 11px/14px var(--font-ui);letter-spacing:.05em;color:var(--color-text-secondary)}
+.nws b{font:700 26px/28px var(--font-ui)}
+.nws.high b{color:var(--status-high-bg)}.nws.medium b{color:var(--status-medium-fg)}.nws.low b{color:var(--status-low-fg)}.nws.unknown b{color:var(--status-unknown-fg)}
+.titem{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--color-border-default);border-radius:10px;background:#fff;min-height:64px;flex:none}
+.titem .chk{width:28px;height:28px}
+.done .tt{text-decoration:line-through;color:var(--color-text-secondary)}
+.task .chk{width:32px;height:32px}
+.empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--color-text-secondary);font-size:13px}
+.pcard{display:flex;align-items:stretch;border:1px solid var(--color-border-default);border-radius:12px;background:#fff;overflow:hidden;cursor:pointer;min-height:78px;flex:none;box-shadow:var(--shadow-card)}
+.pcard .pstrip{width:8px;flex:none}
+.pcard.high .pstrip{background:var(--status-high-bg)}.pcard.medium .pstrip{background:var(--status-medium-border)}.pcard.low .pstrip{background:var(--status-low-fg)}.pcard.unknown .pstrip{background:var(--status-unknown-border)}
+.pcard .pb{flex:1;min-width:0;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.pcard .pn2{width:116px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 8px 6px 0}
+.pane-m{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:8px}
 </style>
 </head>
 <body>
@@ -297,7 +323,7 @@ function mobFrame(o){
   return `<div class="statusbar"><span>9:41</span><span>●●● 100%</span></div><header class="mh">${o.back?`<button class="iconbtn" aria-label="Quay lại"${go(o.back)}>${I('back',22)}</button>`:''}<h1>${o.title}</h1>${o.right||''}</header>
   <div class="mbody">${o.body}</div>${o.fab||''}${tabs}`;
 }
-const TABS_ND=[['tasks','Việc','M1'],['users','Bệnh nhân',''],['bell','Cảnh báo',''],['handover','Bàn giao','M5']];
+const TABS_ND=[['tasks','Việc','M1'],['users','Bệnh nhân','M7'],['bell','Cảnh báo',''],['handover','Bàn giao','M5']];
 const TABS_BS=[['users','Khám','D1'],['bell','Cảnh báo','D2'],['phone','Cuộc gọi','D2'],['user','Tôi','']];
 const bellBtn=`<button class="iconbtn" aria-label="Thông báo">${I('bell',22)}<span class="dot"></span></button>`;
 
@@ -305,14 +331,40 @@ const bellBtn=`<button class="iconbtn" aria-label="Thông báo">${I('bell',22)}<
 const vit=[['Nhịp thở','26 lần/phút',3],['SpO2','92 %',2],['Oxy hỗ trợ','Không',0],['Huyết áp tâm thu','98 mmHg',2],['Mạch','110 lần/phút',1],['Ý thức','Tỉnh táo',0],['Nhiệt độ','37,8 °C',0]];
 const NEWS_P001=vit.reduce((a,v)=>a+v[2],0); // = 8
 const PT=[
- {bed:'A01',id:'P-001',age:82,news:8,flag:'Nhận thức thay đổi mới',upd:'08:40',due:2,rpt:'Draft'},
- {bed:'B01',id:'P-005',age:85,news:7,flag:'Nguy cơ ngã',upd:'08:15',due:2,rpt:'Approved'},
- {bed:'A02',id:'P-002',age:76,news:5,flag:'Cần hỗ trợ vận động',upd:'09:00',due:1,rpt:'Approved'},
- {bed:'A04',id:'P-004',age:79,news:3,flag:'',upd:'08:30',due:0,rpt:'Approved'},
- {bed:'B02',id:'P-006',age:80,news:2,flag:'',upd:'08:20',due:1,rpt:'Approved'},
- {bed:'A03',id:'P-003',age:88,news:null,flag:'Thiếu nhiệt độ',upd:'07:45',due:1,rpt:'Draft'}];
+ {name:'Nguyễn Văn Hòa',bed:'A01',id:'P-001',age:82,news:8,flag:'Nhận thức thay đổi mới',upd:'08:40',due:2,rpt:'Draft'},
+ {name:'Trần Thị Lan',bed:'B01',id:'P-005',age:85,news:7,flag:'Nguy cơ ngã',upd:'08:15',due:2,rpt:'Approved'},
+ {name:'Lê Quang Minh',bed:'A02',id:'P-002',age:76,news:5,flag:'Cần hỗ trợ vận động',upd:'09:00',due:1,rpt:'Approved'},
+ {name:'Hoàng Văn Sáu',bed:'A04',id:'P-004',age:79,news:3,flag:'',upd:'08:30',due:0,rpt:'Approved'},
+ {name:'Võ Đình Khôi',bed:'B02',id:'P-006',age:80,news:2,flag:'',upd:'08:20',due:1,rpt:'Approved'},
+ {name:'Phạm Thị Hạnh',bed:'A03',id:'P-003',age:88,news:null,flag:'Thiếu nhiệt độ',upd:'07:45',due:1,rpt:'Draft'}];
 const nB=p=>p.news==null?unk():news(p.news);
 const flagB=p=>p.flag?bdg(p.news==null?'unknown':'brand',p.flag):'<span class="muted">Không có cờ</span>';
+
+/* ----- v2.1: hàng bệnh nhân tô màu theo mức NEWS, công việc có nút tích hoàn thành ----- */
+const tone=p=>p.news==null?'unknown':p.news>=7?'high':p.news>=5?'medium':'low';
+const LV={high:['Cao','alert-triangle'],medium:['Trung bình','alert-circle'],low:['Thấp','check-circle'],unknown:['Chưa đủ dữ liệu','help-circle']};
+const nameCell=p=>`<div class="pc pn ${tone(p)}"><b>${p.name}</b><span>${p.id} · ${p.age} tuổi</span></div>`;
+const newsCell=p=>{const t=tone(p);return `<div class="pc"><div class="nws ${t}"><small>NEWS</small><b>${p.news==null?'—':p.news}</b></div>${bdg(t,LV[t][0],LV[t][1])}</div>`;};
+const flagCell=p=>`<div class="pc">${flagB(p)}</div>`;
+const dueB=(st,text)=>st==='over'?bdg('highsub',text,'alert-triangle'):st==='soon'?bdg('medium',text,'clock'):st==='done'?bdg('low','Đã xong','check-circle'):bdg('neutral',text);
+const P1_TASKS=[
+ {id:'TASK-002',t:'Đo lại SpO2 và nhịp thở',due:'Quá hạn 12 phút',st:'over',src:'ORD-014',nw:1},
+ {id:'TASK-011',t:'Lấy mẫu khí máu động mạch',due:'09:15',st:'soon',src:'ORD-014',nw:1},
+ {id:'TASK-008',t:'Đo lại nhiệt độ',due:'09:30',st:'soon',src:'self'},
+ {id:'TASK-010',t:'Truyền NaCl 0,9% 500 ml',due:'09:45',st:'',src:'ORD-014',nw:1},
+ {id:'TASK-012',t:'Nằm đầu cao 30°, theo dõi hô hấp',due:'10:00',st:'',src:'ORD-014',nw:1},
+ {id:'TASK-009',t:'Cho thuốc A (1 viên uống)',due:'20:00',st:'',src:'ORD-014',nw:1},
+ {id:'TASK-013',t:'Lấy mẫu công thức máu',due:'06:00 ngày mai',st:'',src:'ORD-014',nw:1},
+ {id:'TASK-007',t:'Đo huyết áp và mạch',due:'08:40',st:'done',src:'self',done:1}];
+const P1_PENDING=P1_TASKS.filter(t=>!t.done).length;
+const W1_TASKS=[
+ ['Đo lại SpO2 và nhịp thở','Nguyễn Văn Hòa','Quá hạn 12 phút','over'],
+ ['Đo nhiệt độ bổ sung','Phạm Thị Hạnh','Quá hạn 07:45','over'],
+ ['Hỗ trợ vận động theo CS-001','Lê Quang Minh','09:00','soon'],
+ ['Lấy mẫu khí máu động mạch','Nguyễn Văn Hòa','09:15','soon'],
+ ['Đo HA trước thuốc','Lê Quang Minh','10:30',''],
+ ['Lấy mẫu xét nghiệm','Trần Thị Lan','10:45',''],
+ ['Cho thuốc buổi trưa','Hoàng Văn Sáu','11:30','']];
 const SUG_TASK='NEWS 8 (từ 7 trở lên) và SpO2 92%: cần đo lại để theo dõi diễn tiến.';
 
 /* modal tạo công việc (dùng ở W1, W2, W6) */
@@ -331,7 +383,7 @@ const def=(id,group,name,kind,note,chg,render)=>{S[id]={id,group,name,kind,note,
 
 /* --- Web Điều dưỡng --- */
 def('W1','Web · Điều dưỡng','Tổng quan bàn trực','web','Từ flow: ĐD nhận thông báo và theo dõi tổng quan người bệnh. Tách rõ NEWS, cờ chăm sóc và công việc đến hạn.',
- 'Thêm nút Tạo công việc (góp ý ĐD-2). Bỏ tab Cảnh báo khỏi điều hướng, cảnh báo vẫn hiện ở thẻ bên phải (ĐD-4). Bấm một hàng mở bệnh án chi tiết (ĐD-1).',
+ 'Danh sách ưu tiên: Bệnh nhân (ô tô màu theo mức NEWS) · Giường · NEWS · Cờ chăm sóc · Cập nhật · Việc hạn, nội dung căn giữa cột. Cột phải: Công việc cần làm (hiện 3 việc, cuộn để xem thêm, có nút tích hoàn thành) và khung Thông báo để trống. Bấm một bệnh nhân mở bệnh án, tab Công việc hiện trước.',
  ()=>ND('Tổng quan',{
  title:'Tổng quan khoa Lão nội trú',sub:'Ca sáng · 07:00–15:00 · 17/11/2026 · 6 người bệnh được phân công',
  actions:btn('Bàn giao ca',{go:'W4'})+btn('Tạo công việc',{icon:'plus',open:'m-create'})+btn('Ghi nhận mới',{v:'primary',icon:'mic',go:'W3'}),
@@ -345,16 +397,15 @@ def('W1','Web · Điều dưỡng','Tổng quan bàn trực','web','Từ flow: �
   <div class="card grow" style="padding:0;gap:0">
    <div class="row sb" style="padding:16px 16px 12px"><h3 style="font:600 16px/24px var(--font-ui)">Ưu tiên theo dõi và chăm sóc</h3><div class="row"><span class="chip on">Tất cả (6)</span><span class="chip">NEWS cao</span><span class="chip">Có việc đến hạn</span></div></div>
    <div class="tbl" style="border-width:1px 0 0;border-radius:0 0 12px 12px">
-    <div class="tr th" style="grid-template-columns:64px 1.1fr 200px 1.4fr 80px 64px"><span>Giường</span><span>Người bệnh</span><span>NEWS</span><span>Cờ chăm sóc</span><span>Cập nhật</span><span>Việc hạn</span></div>
-    ${PT.map(p=>`<div class="tr go" style="grid-template-columns:64px 1.1fr 200px 1.4fr 80px 64px"${go('W6')}><span class="b">${p.bed}</span><span><span class="b">${p.id}</span><br><span class="muted cap">${p.age} tuổi</span></span><span>${nB(p)}</span><span>${flagB(p)}</span><span class="muted">${p.upd}</span><span class="b">${p.due}</span></div>`).join('')}
+    <div class="pr prh" style="grid-template-columns:1.15fr 76px 156px 1.35fr 84px 76px"><div class="pc">Bệnh nhân</div><div class="pc">Giường</div><div class="pc">NEWS</div><div class="pc">Cờ chăm sóc</div><div class="pc">Cập nhật</div><div class="pc">Việc hạn</div></div>
+    ${PT.map(p=>`<div class="pr" style="grid-template-columns:1.15fr 76px 156px 1.35fr 84px 76px"${go('W6','tasks')}>${nameCell(p)}<div class="pc b">${p.bed}</div>${newsCell(p)}${flagCell(p)}<div class="pc muted">${p.upd}</div><div class="pc b">${p.due}</div></div>`).join('')}
    </div></div>
   <div class="col" style="width:352px;flex:none;gap:16px">
-   <div class="card"><h3>Cảnh báo và thông báo</h3>
-    <div class="item go"${go('W6')}><span class="dot"></span><div class="grow"><div class="b sm">AL-001 · P-001 · Lo ngại, NEWS 7</div><div class="cap muted">Đã gửi 08:25 · chưa tiếp nhận</div></div>${bdg('medium','Chờ nhận')}</div>
-    <div class="item"><div class="grow"><div class="b sm">Công việc mới từ y lệnh</div><div class="cap muted">Đo SpO2 mỗi 1 giờ · P-001</div></div>${bdg('brand','Mới')}</div></div>
-   <div class="card"><div class="row sb"><h3>Công việc sắp và quá hạn</h3><button class="btn ghost smb" data-open="m-create">${I('plus',16)}Thêm</button></div>
-    <div class="item"><div class="grow"><div class="b sm">TASK-002 · Đo lại SpO2 · P-001</div><div class="cap muted">Quá hạn 12 phút · từ y lệnh</div></div>${bdg('highsub','Quá hạn','alert-triangle')}</div>
-    <div class="item"><div class="grow"><div class="b sm">TASK-001 · Hỗ trợ vận động · P-002</div><div class="cap muted">Hạn 09:00 · tự tạo</div></div>${bdg('medium','Sắp hạn','clock')}</div></div>
+   <div class="card" style="padding:0;gap:0"><div class="row sb" style="padding:14px 16px 10px"><div><h3>Công việc cần làm</h3><div class="cap muted">${W1_TASKS.length} việc chưa xong · cuộn để xem thêm</div></div><button class="btn ghost smb" data-open="m-create">${I('plus',16)}Tạo</button></div>
+    <div class="col" style="gap:8px;padding:0 12px 12px;max-height:262px;overflow:auto">
+     ${W1_TASKS.map(r=>`<div class="titem" data-task><button class="chk" data-chk aria-label="Đánh dấu hoàn thành">${I('check',18)}</button><div class="grow"><div class="b sm tt">${r[0]}</div><div class="row" style="gap:8px;margin-top:3px;flex-wrap:wrap"><span class="cap muted">${r[1]}</span>${dueB(r[3],r[2])}</div></div></div>`).join('')}
+    </div></div>
+   <div class="card" style="flex:1"><h3>Thông báo</h3><div class="empty">Chưa có thông báo</div></div>
   </div></div>`}));
 
 def('W2','Web · Điều dưỡng','Công việc','web','Từ flow: hệ thống chấm điểm, phân công task. Nay có thêm công việc điều dưỡng tự tạo. Bấm từng hàng để xem hai chế độ: sửa được và chỉ đọc.',
@@ -434,10 +485,10 @@ def('W5','Web · Điều dưỡng','Danh sách bệnh nhân (mới)','web','Màn
  ()=>ND('Bệnh nhân',{
  title:'Bệnh nhân',sub:'Khoa Lão nội trú · 6 người bệnh được phân công trong ca',
  actions:btn('Tạo công việc',{icon:'plus',open:'m-create'}),modals:mCreate(),
- body:`<div class="row"><div class="srch">${I('search',18)}<input data-filter placeholder="Tìm theo giường, mã bệnh nhân, cờ chăm sóc" aria-label="Tìm bệnh nhân"></div><span class="chip on">Tất cả (6)</span><span class="chip">Của tôi (4)</span><span class="chip">NEWS cao</span><span class="chip">Report Draft (2)</span></div>
+ body:`<div class="row"><div class="srch">${I('search',18)}<input data-filter placeholder="Tìm theo tên, giường, mã bệnh nhân, cờ chăm sóc" aria-label="Tìm bệnh nhân"></div><span class="chip on">Tất cả (6)</span><span class="chip">Của tôi (4)</span><span class="chip">NEWS cao</span><span class="chip">Report Draft (2)</span></div>
  <div class="tbl">
-  <div class="tr th" style="grid-template-columns:64px 1.1fr 190px 1.3fr 150px 70px 24px"><span>Giường</span><span>Người bệnh</span><span>NEWS</span><span>Cờ chăm sóc</span><span>Report mới nhất</span><span>Việc hạn</span><span></span></div>
-  ${PT.map(p=>`<div class="tr go" data-q="${p.bed} ${p.id} ${p.flag} ${p.rpt}" style="grid-template-columns:64px 1.1fr 190px 1.3fr 150px 70px 24px"${go('W6')}><span class="b">${p.bed}</span><span><span class="b">${p.id}</span><br><span class="muted cap">${p.age} tuổi</span></span><span>${nB(p)}</span><span>${flagB(p)}</span><span>${rb(p.rpt)}</span><span class="b">${p.due}</span><span class="muted">${I('chevron',16)}</span></div>`).join('')}
+  <div class="pr prh" style="grid-template-columns:1.2fr 80px 170px 1.3fr 140px 80px 32px"><div class="pc">Bệnh nhân</div><div class="pc">Giường</div><div class="pc">NEWS</div><div class="pc">Cờ chăm sóc</div><div class="pc">Report mới nhất</div><div class="pc">Việc hạn</div><div class="pc"></div></div>
+  ${PT.map(p=>`<div class="pr" data-q="${p.name} ${p.bed} ${p.id} ${p.flag} ${p.rpt}" style="grid-template-columns:1.2fr 80px 170px 1.3fr 140px 80px 32px"${go('W6','tasks')}>${nameCell(p)}<div class="pc b">${p.bed}</div>${newsCell(p)}${flagCell(p)}<div class="pc">${rb(p.rpt)}</div><div class="pc b">${p.due}</div><div class="pc muted">${I('chevron',16)}</div></div>`).join('')}
  </div>`}));
 
 /* hàm dựng bệnh án chi tiết (dùng cho điều dưỡng W6 và bác sĩ B4) */
@@ -457,32 +508,55 @@ function record(shellFn,activeLabel,role,tab){
    ${rp.map(r=>`<div class="tr" style="grid-template-columns:90px 120px 150px 1fr 120px 150px"><span class="b">${r[0]}</span><span>${r[1]}</span><span>${news(r[2],1)}</span><span class="muted">${r[4]}</span><span>${rb(r[3])}</span><span style="text-align:right">${r[3]==='Draft'&&nd?btn('Mở và chỉnh sửa',{sm:1,v:'primary',go:'W3'}):btn('Xem',{sm:1})}</span></div>`).join('')}</div>
    <div class="cap muted">Draft: nháp chưa được điều dưỡng xác nhận. Approved: điều dưỡng đã xác nhận, không còn là nháp.</div>`;
   const srcB=(s,c)=>s==='self'?bdg('brand','Tự tạo','edit'):`<span class="badge neutral">${I('lock',12)}Y lệnh ${c}</span>`;
-  const tasks=`<div class="row sb"><span class="muted sm">Công việc của P-001</span>${nd?btn('Tạo công việc',{sm:1,icon:'plus',open:'m-create'}):''}</div>
-   <div class="tbl"><div class="tr th" style="grid-template-columns:90px 1.6fr 110px 130px 150px"><span>Mã</span><span>Công việc</span><span>Hạn</span><span>Nguồn</span><span></span></div>
-   ${[['TASK-002','Đo lại SpO2 và nhịp thở',bdg('highsub','Quá hạn 12 phút'),'ORD-014'],['TASK-008','Đo lại nhiệt độ','09:30','self'],['TASK-009','Cho thuốc A','20:00','ORD-014']].map(r=>`<div class="tr" style="grid-template-columns:90px 1.6fr 110px 130px 150px"><span class="muted">${r[0]}</span><span class="b">${r[1]}</span><span>${r[2]}</span><span>${srcB(r[3]==='self'?'self':'o',r[3].slice(4))}</span><span style="text-align:right">${nd?btn(r[3]==='self'?'Sửa':'Mở y lệnh',{sm:1,go:r[3]==='self'?'W2':'W6',tab:r[3]==='self'?'':'orders'}):''}</span></div>`).join('')}</div>`;
+  const gt=nd?'40px 86px 1.7fr 150px 140px 130px':'86px 1.7fr 150px 140px 130px';
+  const tasks=`<div class="row sb"><span class="muted sm">${P1_PENDING} việc chưa xong · tích ô vuông để đánh dấu hoàn thành</span>${nd?btn('Tạo công việc',{sm:1,icon:'plus',open:'m-create'}):''}</div>
+   <div class="tbl"><div class="tr th" style="grid-template-columns:${gt}">${nd?'<span></span>':''}<span>Mã</span><span>Công việc</span><span>Hạn</span><span>Nguồn</span><span></span></div>
+   ${P1_TASKS.map(r=>`<div class="tr ${r.done?'done':''}" data-task style="grid-template-columns:${gt}">${nd?chk(r.done):''}<span class="muted">${r.id}</span><span class="b tt">${r.t} ${r.nw?bdg('brand','Mới'):''}</span><span>${dueB(r.st,r.due)}</span><span>${srcB(r.src==='self'?'self':'o',r.src.slice(4))}</span><span style="text-align:right">${nd?btn(r.src==='self'?'Sửa':'Mở y lệnh',{sm:1,go:r.src==='self'?'W2':'W6',tab:r.src==='self'?'':'orders'}):''}</span></div>`).join('')}</div>`;
   const orders=`<div class="row sb"><span class="muted sm">Y lệnh của P-001 ${nd?'· chỉ đọc':''}</span>${nd?bdg('neutral','Chỉ đọc','lock'):btn('Y lệnh mới',{sm:1,v:'primary',icon:'plus',go:'B1'})}</div>
    ${[['ORD-014','17/11 · 07:30','Bác sĩ B','Chẩn đoán: suy hô hấp. Thuốc A 1 viên uống, 2 lần/ngày (08:00, 20:00); NaCl 0,9% 500 ml; khí máu động mạch ngay; theo dõi SpO2 và nhịp thở mỗi 1 giờ, báo bác sĩ nếu SpO2 dưới 94%.',3],['ORD-009','16/11 · 15:10','Bác sĩ B','Theo dõi ăn uống, ghi vào–ra. Hỗ trợ vận động theo CS-001.',2]].map(r=>`<div class="card flat"><div class="row sb"><div class="row"><b>${r[0]}</b><span class="muted sm">${r[1]} · ${r[2]}</span></div><div class="row">${bdg('low','Đã xác nhận','check-circle')}<span class="badge neutral">${r[4]} công việc</span></div></div><div class="sm">${r[3]}</div></div>`).join('')}`;
   return shellFn(activeLabel,{
-   title:'P-001 · Giường A01',sub:`<span class="lnk" tabindex="0" role="link" data-go="${nd?'W5':'B3'}">← ${nd?'Danh sách bệnh nhân':'Dashboard'}</span> · 82 tuổi · Khoa Lão nội trú ${news(8)}`,
+   title:'Nguyễn Văn Hòa · Giường A01',sub:`<span class="lnk" tabindex="0" role="link" data-go="${nd?'W5':'B3'}">← ${nd?'Danh sách bệnh nhân':'Dashboard'}</span> · P-001 · 82 tuổi · Khoa Lão nội trú ${news(8)}`,
    actions:nd?btn('Tạo công việc',{icon:'plus',open:'m-create'})+btn('Ghi nhận mới',{v:'primary',icon:'mic',go:'W3'}):btn('Y lệnh mới',{v:'primary',icon:'plus',go:'B1'}),
    modals:nd?mCreate():'',
-   body:`<div class="ptabs">${tb('overview','Tổng quan')}${tb('reports','Báo cáo',4)}${tb('tasks','Công việc',3)}${tb('orders','Y lệnh',2)}</div>
+   body:`<div class="ptabs">${nd?tb('tasks','Công việc',P1_PENDING)+tb('overview','Tổng quan')+tb('reports','Báo cáo',4)+tb('orders','Y lệnh',2):tb('overview','Tổng quan')+tb('reports','Báo cáo',4)+tb('tasks','Công việc',P1_PENDING)+tb('orders','Y lệnh',2)}</div>
    ${pane('overview',overview)}${pane('reports',reports)}${pane('tasks',tasks)}${pane('orders',orders)}`});
 }
-def('W6','Web · Điều dưỡng','Bệnh án chi tiết (mới)','web','Màn mới: bệnh án của một bệnh nhân gồm Tổng quan, Báo cáo, Công việc, Y lệnh. Mở sẵn tab Báo cáo để xem nhãn Draft và Approved.',
- 'Danh sách báo cáo nằm trong bệnh án từng bệnh nhân, mỗi báo cáo có nhãn Draft hoặc Approved (ĐD-5). Y lệnh hiển thị chỉ đọc, là nơi công việc từ y lệnh trỏ về (ĐD-2).',
- ()=>record(ND,'Bệnh nhân','nd','reports'));
+def('W6','Web · Điều dưỡng','Bệnh án chi tiết (mới)','web','Màn mới: bệnh án của một bệnh nhân gồm Tổng quan, Báo cáo, Công việc, Y lệnh. Mở sẵn tab Công việc (8 việc, có nút tích hoàn thành); bấm tab Báo cáo để xem nhãn Draft và Approved.',
+ 'Vào bệnh án thì tab Công việc hiện trước, thêm khoảng 5 việc mới từ y lệnh ORD-014 (tổng 8 việc, 1 việc đã xong), mỗi việc có ô tích hoàn thành. Báo cáo Draft/Approved và Y lệnh chỉ đọc vẫn ở các tab còn lại.',
+ ()=>record(ND,'Bệnh nhân','nd','tasks'));
 
 /* --- Mobile Điều dưỡng (giữ nguyên theo góp ý) --- */
-def('M1','Mobile · Điều dưỡng','To-do list và thông báo','mobile','Từ flow: thông báo đến tài khoản trong ca → hiển thị trong [To-do list] → ĐD nhận thông báo. Vùng chạm tối thiểu 48px, nút ghi âm 64px.','Giữ nguyên.',()=>mobFrame({title:'Công việc',right:bellBtn,tabs:TABS_ND,tab:0,
+def('M1','Mobile · Điều dưỡng','To-do list và thông báo','mobile','Từ flow: bác sĩ gửi y lệnh → thông báo đến điều dưỡng → hiển thị trong [To-do list]. Vùng chạm tối thiểu 48px, nút ghi âm 64px.','Thêm thông báo Y lệnh mới (bấm vào xem bệnh nhân và công việc), mỗi việc có ô tích hoàn thành, tên bệnh nhân thay mã. Tab Bệnh nhân nay mở danh sách bệnh nhân (M7).',()=>mobFrame({title:'Công việc',right:bellBtn,tabs:TABS_ND,tab:0,
  fab:`<button class="fab" aria-label="Ghi âm cập nhật"${go('M2')}>${I('mic',28)}</button>`,
- body:`<div class="note ai row" style="gap:10px">${bdg('brand','Mới')}<span class="sm grow">2 công việc mới được giao cho bạn</span></div>
+ body:`<div class="note ai" style="cursor:pointer"${go('M8')}><div class="row" style="gap:8px">${bdg('brand','Y lệnh mới')}<span class="cap muted">07:30 · Bác sĩ B</span></div><div class="sm" style="margin-top:6px"><b>Nguyễn Văn Hòa</b> · Giường A01: ${P1_TASKS.filter(t=>t.nw).length} công việc mới từ y lệnh. <span class="lnk">Xem</span></div></div>
  <div class="row"><span class="chip on">Đến hạn (5)</span><span class="chip">Tất cả</span><span class="chip">Của tôi</span></div>
- ${[['Đo lại SpO2 và nhịp thở','P-001 · Giường A01',bdg('highsub','Quá hạn','alert-triangle'),'M3'],
-    ['Hỗ trợ vận động theo CS-001','P-002 · Giường A02',bdg('medium','09:00','clock'),''],
-    ['Đo HA trước thuốc','P-002 · Giường A02',bdg('neutral','10:30'),''],
-    ['Lấy mẫu xét nghiệm','P-005 · Giường B01',bdg('neutral','10:45'),'']]
-  .map(r=>`<div class="task"${go(r[3])} style="${r[3]?'cursor:pointer':''}">${chk(false)}<div class="grow"><div class="b sm">${r[0]}</div><div class="cap muted">${r[1]}</div></div>${r[2]}</div>`).join('')}`}));
+ ${[['Đo lại SpO2 và nhịp thở','Nguyễn Văn Hòa · Giường A01',bdg('highsub','Quá hạn','alert-triangle'),'M8'],
+    ['Hỗ trợ vận động theo CS-001','Lê Quang Minh · Giường A02',bdg('medium','09:00','clock'),''],
+    ['Đo HA trước thuốc','Lê Quang Minh · Giường A02',bdg('neutral','10:30'),''],
+    ['Lấy mẫu xét nghiệm','Trần Thị Lan · Giường B01',bdg('neutral','10:45'),'']]
+  .map(r=>`<div class="task" data-task${go(r[3])} style="${r[3]?'cursor:pointer':''}">${chk(false)}<div class="grow"><div class="b sm tt">${r[0]}</div><div class="cap muted">${r[1]}</div></div>${r[2]}</div>`).join('')}`}));
+
+def('M7','Mobile · Điều dưỡng','Danh sách bệnh nhân (mới)','mobile','Điều dưỡng xem bệnh nhân được phân công, sắp theo NEWS giảm dần. Mỗi thẻ có dải màu theo mức NEWS kèm chữ và biểu tượng. Bấm một thẻ mở chi tiết bệnh nhân, công việc hiện trước.','Màn mới, tương ứng W5 trên web.',()=>mobFrame({title:'Bệnh nhân',right:bellBtn,tabs:TABS_ND,tab:1,
+ body:`<div class="srch" style="width:auto;min-height:44px">${I('search',18)}<input data-filter placeholder="Tìm tên, giường, mã" aria-label="Tìm bệnh nhân"></div>
+ <div class="pane-m" style="gap:10px">${[...PT].sort((x,y)=>(y.news??-1)-(x.news??-1)).map(p=>`<div class="pcard ${tone(p)}" data-q="${p.name} ${p.bed} ${p.id} ${p.flag}"${go('M8')}><div class="pstrip"></div><div class="pb"><div class="b">${p.name}</div><div class="cap muted">Giường ${p.bed} · ${p.age} tuổi · đo ${p.upd}</div>${p.flag?`<div style="margin-top:4px">${flagB(p)}</div>`:''}</div><div class="pn2"><div class="nws ${tone(p)}"><small>NEWS</small><b>${p.news==null?'—':p.news}</b></div>${bdg(tone(p),tone(p)==='unknown'?'Thiếu dữ liệu':LV[tone(p)][0],LV[tone(p)][1])}</div></div>`).join('')}</div>`}));
+
+def('M8','Mobile · Điều dưỡng','Chi tiết bệnh nhân (mới)','mobile','Luồng demo: nhận y lệnh → xem bệnh nhân → xem công việc. Vào bệnh nhân thì tab Công việc hiện trước, có 3 tab: Công việc, Y lệnh (chỉ đọc), Chỉ số.','Màn mới, tương ứng W6 trên web: tab Công việc đầu tiên, 8 việc có ô tích hoàn thành.',()=>mobFrame({title:'Nguyễn Văn Hòa',back:'M7',right:news(8,1),tabs:TABS_ND,tab:1,
+ body:`<div class="cap muted">Giường A01 · 82 tuổi · P-001 · ${bdg('brand','Nhận thức thay đổi mới')}</div>
+ <div class="seg" style="display:flex;width:100%"><button class="on" style="flex:1" data-show="m8-tasks" data-group="mt">Công việc ${P1_PENDING}</button><button style="flex:1" data-show="m8-ord" data-group="mt">Y lệnh</button><button style="flex:1" data-show="m8-vit" data-group="mt">Chỉ số</button></div>
+ <div id="m8-tasks" data-pane-g="mt" class="pane-m">
+  <div class="note ai" style="padding:8px 12px"><b>Y lệnh ORD-014</b> · Bác sĩ B · 07:30 · ${P1_TASKS.filter(t=>t.nw).length} việc mới</div>
+  ${P1_TASKS.map(r=>`<div class="task ${r.done?'done':''}" data-task style="min-height:60px;padding:8px 12px">${chk(r.done)}<div class="grow"><div class="b sm tt">${r.t}</div><div class="cap muted">${r.src==='self'?'Tự tạo':'Y lệnh '+r.src.slice(4)}${r.nw?' · Mới':''}</div></div>${dueB(r.st,r.due)}</div>`).join('')}
+  ${btn('Tạo công việc',{sm:1,icon:'plus',full:1})}</div>
+ <div id="m8-ord" data-pane-g="mt" class="pane-m" hidden>
+  <div class="row sb"><span class="cap muted">ORD-014 · Bác sĩ B · 07:30</span>${bdg('neutral','Chỉ đọc','lock')}</div>
+  <div class="card flat" style="padding:12px;gap:6px"><div class="cap muted b">Chẩn đoán</div><div class="sm">${ORD_DATA.dx}</div></div>
+  <div class="card flat" style="padding:12px;gap:6px"><div class="cap muted b">Chăm sóc & Hô hấp</div><div class="sm">${ORD_DATA.care}</div></div>
+  ${[['Thuốc',ORD_DATA.thuoc],['Dịch truyền',ORD_DATA.dich],['Cận lâm sàng',ORD_DATA.cls]].map(g=>`<div class="card flat" style="padding:12px;gap:4px"><div class="cap muted b">${g[0]}</div>${g[1].length?g[1].map(r=>`<div class="sm"><b>${r[0]}</b>${r[1]?': '+r[1]:''}</div>`).join(''):'<div class="sm muted">Không có</div>'}</div>`).join('')}
+  <div class="card flat" style="padding:12px;gap:6px"><div class="cap muted b">Theo dõi</div><div class="sm">${ORD_DATA.follow}</div></div></div>
+ <div id="m8-vit" data-pane-g="mt" class="pane-m" hidden>
+  <div class="row sb"><span class="cap muted">Đo lúc 08:40</span>${news(NEWS_P001,1)}</div>
+  ${[[vit[4],vit[3]],[vit[1],vit[6]],[vit[0],vit[5]]].map(rw=>`<div class="row" style="gap:10px;align-items:stretch">${rw.map(v=>`<div class="card metric"><span class="cap muted">${v[0]}</span><span class="v">${v[0]==='Ý thức'?v[1]:v[1].split(' ')[0]}</span><span class="cap muted">${v[0]==='Ý thức'?'&nbsp;':(v[1].split(' ').slice(1).join(' ')||'&nbsp;')}</span>${pts(v[2])}</div>`).join('')}</div>`).join('')}
+  ${btn('Ghi âm cập nhật',{v:'primary',full:1,lg:1,icon:'mic',go:'M2'})}</div>`}));
 
 def('M2','Mobile · Điều dưỡng','Ghi âm cập nhật trạng thái','mobile','Từ flow: ghi âm cập nhật trạng thái bệnh nhân → Voice → dữ liệu → bản nháp report. Luôn có đường nhập tay khi phòng ồn.','Giữ nguyên.',()=>mobFrame({title:'Ghi âm cập nhật',back:'M1',
  body:`<div class="item"><span class="avatar">82</span><div class="grow"><div class="b sm">P-001 · Giường A01</div><div class="cap muted">Đổi người bệnh</div></div>${news(8,1)}</div>
@@ -598,7 +672,7 @@ def('B3','Web · Bác sĩ','Dashboard bác sĩ','web','Từ flow: khám 2 lần/
    <div class="card" style="padding:0;gap:0"><div class="row sb" style="padding:14px 16px"><h3 style="font:600 16px/24px var(--font-ui)">Danh sách bệnh nhân</h3><div class="srch" style="width:260px;min-height:36px">${I('search',16)}<input data-filter placeholder="Tìm giường, mã, cờ…" aria-label="Tìm bệnh nhân"></div></div>
     <div class="tbl" style="border-width:1px 0 0;border-radius:0 0 12px 12px">
      <div class="tr th" style="grid-template-columns:56px 1fr 180px 1.2fr 24px;padding:8px 14px"><span>Giường</span><span>Người bệnh</span><span>NEWS</span><span>Cờ chăm sóc</span><span></span></div>
-     ${PT.map(p=>`<div class="tr go" data-q="${p.bed} ${p.id} ${p.flag}" style="grid-template-columns:56px 1fr 180px 1.2fr 24px;padding:9px 14px"${go('B4')}><span class="b">${p.bed}</span><span><span class="b">${p.id}</span> <span class="muted cap">${p.age} tuổi</span></span><span>${nB(p)}</span><span>${flagB(p)}</span><span class="muted">${I('chevron',16)}</span></div>`).join('')}</div></div></div>
+     ${PT.map(p=>`<div class="tr go" data-q="${p.bed} ${p.id} ${p.flag}" style="grid-template-columns:56px 1fr 180px 1.2fr 24px;padding:9px 14px"${go('B4')}><span class="b">${p.bed}</span><span><span class="b">${p.name}</span> <span class="muted cap">${p.id}</span></span><span>${nB(p)}</span><span>${flagB(p)}</span><span class="muted">${I('chevron',16)}</span></div>`).join('')}</div></div></div>
   <div class="col" style="width:330px;flex:none;gap:16px">
    <div class="card"><h3>Cảnh báo cần lưu ý</h3>
     <div class="item"><span class="dot"></span><div class="grow"><div class="b sm">AL-001 · P-001 · NEWS 7→8</div><div class="cap muted">Gửi 08:25 · chưa tiếp nhận</div></div>${btn('Tiếp nhận',{sm:1,v:'primary',go:'B4'})}</div>
@@ -680,12 +754,12 @@ const norm=t=>t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/�
 function ghostSync(ta){const gh=ta.previousElementSibling;if(!gh)return;const sug=ta.dataset.sug,v=ta.value;gh.querySelector('.gv').textContent=v;gh.querySelector('.gs').textContent=(v===''||sug.startsWith(v))?sug.slice(v.length):'';}
 document.addEventListener('input',e=>{
   if(e.target.matches('.gt'))ghostSync(e.target);
-  if(e.target.matches('[data-filter]')){const q=norm(e.target.value.trim());frame.querySelectorAll('.tr[data-q]').forEach(r=>{r.hidden=!norm(r.dataset.q).includes(q);});}
+  if(e.target.matches('[data-filter]')){const q=norm(e.target.value.trim());frame.querySelectorAll('[data-q]').forEach(r=>{r.hidden=!norm(r.dataset.q).includes(q);});}
 });
 document.addEventListener('click',e=>{
   if(!frame.contains(e.target))return;
   const c=e.target.closest('[data-chk]');
-  if(c){c.classList.toggle('on');return;}
+  if(c){c.classList.toggle('on');const rw=c.closest('[data-task]');if(rw)rw.classList.toggle('done',c.classList.contains('on'));return;}
   const sg=e.target.closest('[data-seg]');
   if(sg){sg.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));sg.classList.add('on');
     const ctl=sg.parentElement.dataset.ctl;if(ctl){const one=sg.dataset.val==='1';const a=frame.querySelector('#'+ctl+'-1'),z=frame.querySelector('#'+ctl+'-0');if(a)a.hidden=!one;if(z)z.hidden=one;}return;}
