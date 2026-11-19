@@ -343,8 +343,8 @@ const flagB=p=>p.flag?bdg(p.news==null?'unknown':'brand',p.flag):'<span class="m
 /* ----- v2.1: hàng bệnh nhân tô màu theo mức NEWS, công việc có nút tích hoàn thành ----- */
 const tone=p=>p.news==null?'unknown':p.news>=7?'high':p.news>=5?'medium':'low';
 const LV={high:['Cao','alert-triangle'],medium:['Trung bình','alert-circle'],low:['Thấp','check-circle'],unknown:['Chưa đủ dữ liệu','help-circle']};
-const nameCell=p=>`<div class="pc pn ${tone(p)}"><b>${p.name}</b><span>${p.id} · ${p.age} tuổi</span></div>`;
-const newsCell=p=>{const t=tone(p);return `<div class="pc"><div class="nws ${t}"><small>NEWS</small><b>${p.news==null?'—':p.news}</b></div>${bdg(t,LV[t][0],LV[t][1])}</div>`;};
+const nameCell=(p,sub=true)=>`<div class="pc pn ${tone(p)}"><b>${p.name}</b>${sub?`<span>${p.id} · ${p.age} tuổi</span>`:''}</div>`;
+const newsCell=(p,lvl=true)=>{const t=tone(p);return `<div class="pc"><div class="nws ${t}"><small>NEWS</small><b>${p.news==null?'—':p.news}</b></div>${lvl||t==='unknown'?bdg(t,LV[t][0],LV[t][1]):''}</div>`;};
 const flagCell=p=>`<div class="pc">${flagB(p)}</div>`;
 const dueB=(st,text)=>st==='over'?bdg('highsub',text,'alert-triangle'):st==='soon'?bdg('medium',text,'clock'):st==='done'?bdg('low','Đã xong','check-circle'):bdg('neutral',text);
 const P1_TASKS=[
@@ -397,13 +397,13 @@ def('W1','Web · Điều dưỡng','Tổng quan bàn trực','web','Từ flow: �
   <div class="card grow" style="padding:0;gap:0">
    <div class="row sb" style="padding:16px 16px 12px"><h3 style="font:600 16px/24px var(--font-ui)">Ưu tiên theo dõi và chăm sóc</h3><div class="row"><span class="chip on">Tất cả (6)</span><span class="chip">NEWS cao</span><span class="chip">Có việc đến hạn</span></div></div>
    <div class="tbl" style="border-width:1px 0 0;border-radius:0 0 12px 12px">
-    <div class="pr prh" style="grid-template-columns:1.15fr 76px 156px 1.35fr 84px 76px"><div class="pc">Bệnh nhân</div><div class="pc">Giường</div><div class="pc">NEWS</div><div class="pc">Cờ chăm sóc</div><div class="pc">Cập nhật</div><div class="pc">Việc hạn</div></div>
-    ${PT.map(p=>`<div class="pr" style="grid-template-columns:1.15fr 76px 156px 1.35fr 84px 76px"${go('W6','tasks')}>${nameCell(p)}<div class="pc b">${p.bed}</div>${newsCell(p)}${flagCell(p)}<div class="pc muted">${p.upd}</div><div class="pc b">${p.due}</div></div>`).join('')}
+    <div class="pr prh" style="grid-template-columns:1.15fr 76px 112px 1.35fr 84px 76px"><div class="pc">Bệnh nhân</div><div class="pc">Giường</div><div class="pc">NEWS</div><div class="pc">Cờ chăm sóc</div><div class="pc">Cập nhật</div><div class="pc">Việc hạn</div></div>
+    ${PT.map(p=>`<div class="pr" style="grid-template-columns:1.15fr 76px 112px 1.35fr 84px 76px"${go('W6','tasks')}>${nameCell(p,false)}<div class="pc b">${p.bed}</div>${newsCell(p,false)}${flagCell(p)}<div class="pc muted">${p.upd}</div><div class="pc b">${p.due}</div></div>`).join('')}
    </div></div>
-  <div class="col" style="width:352px;flex:none;gap:16px">
+  <div class="col" style="width:392px;flex:none;gap:16px">
    <div class="card" style="padding:0;gap:0"><div class="row sb" style="padding:14px 16px 10px"><div><h3>Công việc cần làm</h3><div class="cap muted">${W1_TASKS.length} việc chưa xong · cuộn để xem thêm</div></div><button class="btn ghost smb" data-open="m-create">${I('plus',16)}Tạo</button></div>
     <div class="col" style="gap:8px;padding:0 12px 12px;max-height:262px;overflow:auto">
-     ${W1_TASKS.map(r=>`<div class="titem" data-task><button class="chk" data-chk aria-label="Đánh dấu hoàn thành">${I('check',18)}</button><div class="grow"><div class="b sm tt">${r[0]}</div><div class="row" style="gap:8px;margin-top:3px;flex-wrap:wrap"><span class="cap muted">${r[1]}</span>${dueB(r[3],r[2])}</div></div></div>`).join('')}
+     ${W1_TASKS.map(r=>`<div class="titem" data-task><button class="chk" data-chk aria-label="Đánh dấu hoàn thành">${I('check',18)}</button><div class="grow"><div class="row sb" style="gap:8px;align-items:center"><div class="b sm tt" style="min-width:0">${r[0]}</div><span style="flex:none;white-space:nowrap">${dueB(r[3],r[2])}</span></div><div class="cap muted" style="margin-top:2px">${r[1]}</div></div></div>`).join('')}
     </div></div>
    <div class="card" style="flex:1"><h3>Thông báo</h3><div class="empty">Chưa có thông báo</div></div>
   </div></div>`}));
@@ -487,8 +487,8 @@ def('W5','Web · Điều dưỡng','Danh sách bệnh nhân (mới)','web','Màn
  actions:btn('Tạo công việc',{icon:'plus',open:'m-create'}),modals:mCreate(),
  body:`<div class="row"><div class="srch">${I('search',18)}<input data-filter placeholder="Tìm theo tên, giường, mã bệnh nhân, cờ chăm sóc" aria-label="Tìm bệnh nhân"></div><span class="chip on">Tất cả (6)</span><span class="chip">Của tôi (4)</span><span class="chip">NEWS cao</span><span class="chip">Report Draft (2)</span></div>
  <div class="tbl">
-  <div class="pr prh" style="grid-template-columns:1.2fr 80px 170px 1.3fr 140px 80px 32px"><div class="pc">Bệnh nhân</div><div class="pc">Giường</div><div class="pc">NEWS</div><div class="pc">Cờ chăm sóc</div><div class="pc">Report mới nhất</div><div class="pc">Việc hạn</div><div class="pc"></div></div>
-  ${PT.map(p=>`<div class="pr" data-q="${p.name} ${p.bed} ${p.id} ${p.flag} ${p.rpt}" style="grid-template-columns:1.2fr 80px 170px 1.3fr 140px 80px 32px"${go('W6','tasks')}>${nameCell(p)}<div class="pc b">${p.bed}</div>${newsCell(p)}${flagCell(p)}<div class="pc">${rb(p.rpt)}</div><div class="pc b">${p.due}</div><div class="pc muted">${I('chevron',16)}</div></div>`).join('')}
+  <div class="pr prh" style="grid-template-columns:1.2fr 80px 112px 1.3fr 140px 80px 32px"><div class="pc">Bệnh nhân</div><div class="pc">Giường</div><div class="pc">NEWS</div><div class="pc">Cờ chăm sóc</div><div class="pc">Report mới nhất</div><div class="pc">Việc hạn</div><div class="pc"></div></div>
+  ${PT.map(p=>`<div class="pr" data-q="${p.name} ${p.bed} ${p.id} ${p.flag} ${p.rpt}" style="grid-template-columns:1.2fr 80px 112px 1.3fr 140px 80px 32px"${go('W6','tasks')}>${nameCell(p,false)}<div class="pc b">${p.bed}</div>${newsCell(p,false)}${flagCell(p)}<div class="pc">${rb(p.rpt)}</div><div class="pc b">${p.due}</div><div class="pc muted">${I('chevron',16)}</div></div>`).join('')}
  </div>`}));
 
 /* hàm dựng bệnh án chi tiết (dùng cho điều dưỡng W6 và bác sĩ B4) */
